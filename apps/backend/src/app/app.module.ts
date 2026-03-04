@@ -24,7 +24,7 @@ import { DocumentosModule } from '../documentos/documentos.module';
 						type: 'postgres' as const,
 						url: databaseUrl,
 						entities: [Expediente, DocumentoGrupo, Archivo],
-						synchronize: false,
+						synchronize: true, // temporal - para crear las tablas
 						logging: false,
 						ssl: { rejectUnauthorized: false },
 					};
