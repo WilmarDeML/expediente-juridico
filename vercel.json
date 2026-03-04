@@ -1,0 +1,12 @@
+{
+  "buildCommand": "pnpm tw:build && pnpm nx build frontend --configuration=production",
+  "outputDirectory": "dist/apps/frontend/browser",
+  "installCommand": "pnpm install",
+  "framework": null,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "env": {
+    "API_URL": "https://expediente-juridico-backend.onrender.com/api"
+  }
+}

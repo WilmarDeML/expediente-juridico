@@ -21,7 +21,9 @@ export class ExpedienteService {
   private readonly http       = inject(HttpClient);
   private readonly transferState = inject(TransferState);
   private readonly platformId    = inject(PLATFORM_ID);
-  private readonly apiUrl        = 'http://localhost:3000/api';
+  private readonly apiUrl        = typeof window !== 'undefined'
+    ? (window as any).__ENV__?.API_URL ?? 'http://localhost:3000/api'
+    : process.env['API_URL'] ?? 'http://localhost:3000/api';
 
   findAll(): Observable<Expediente[]> {
     const cached = this.transferState.get(EXPEDIENTES_KEY, null);

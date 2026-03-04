@@ -1,0 +1,44 @@
+services:
+  - type: web
+    name: expediente-juridico-backend
+    runtime: node
+    rootDir: .
+    buildCommand: pnpm install && pnpm nx build backend --configuration=production
+    startCommand: node dist/apps/backend/main.js
+    healthCheckPath: /api
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: BACKEND_PORT
+        value: 3000
+      - key: DATABASE_HOST
+        fromDatabase:
+          name: expediente-juridico-db
+          property: host
+      - key: DATABASE_PORT
+        fromDatabase:
+          name: expediente-juridico-db
+          property: port
+      - key: DATABASE_NAME
+        fromDatabase:
+          name: expediente-juridico-db
+          property: database
+      - key: DATABASE_USER
+        fromDatabase:
+          name: expediente-juridico-db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: expediente-juridico-db
+          property: password
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+
+databases:
+  - name: expediente-juridico-db
+    databaseName: expediente_juridico
+    plan: free
