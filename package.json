@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "tw:build": "tailwindcss -i ./apps/frontend/src/tailwind.input.css -o ./apps/frontend/src/styles.css",
-    "tw:watch": "tailwindcss -i ./apps/frontend/src/tailwind.input.css -o ./apps/frontend/src/styles.css --watch"
+    "tw:watch": "tailwindcss -i ./apps/frontend/src/tailwind.input.css -o ./apps/frontend/src/styles.css --watch",
+    "seed": "ts-node -P apps/backend/tsconfig.app.json apps/backend/src/common/seed.ts"
   },
   "private": true,
   "devDependencies": {
@@ -36,6 +37,7 @@
     "@swc/helpers": "0.5.18",
     "@tailwindcss/cli": "^4.2.1",
     "@tailwindcss/postcss": "^4.2.1",
+    "@types/dotenv": "^8.2.3",
     "@types/express": "^4.17.21",
     "@types/jest": "^30.0.0",
     "@types/multer": "^2.0.0",
@@ -83,6 +85,7 @@
     "axios": "^1.6.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
+    "dotenv": "^17.3.1",
     "express": "^4.21.2",
     "multer": "^2.1.0",
     "pg": "^8.19.0",
