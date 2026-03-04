@@ -7,6 +7,7 @@ import { Expediente } from '../expedientes/expediente.entity';
 import { DocumentoGrupo } from '../documentos/documento-grupo.entity';
 import { Archivo } from '../documentos/archivo.entity';
 import { ExpedientesModule } from '../expedientes/expedientes.module';
+import { DocumentosModule } from '../documentos/documentos.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ExpedientesModule } from '../expedientes/expedientes.module';
       inject: [ConfigService],
     }),
     ExpedientesModule,
+    DocumentosModule,
   ],
   controllers: [AppController],
   providers: [AppService],
