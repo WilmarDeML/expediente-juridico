@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Meta, Title } from '@angular/platform-browser';
 import { ExpedienteService } from '../services/expediente.service';
 import { DocumentoService } from '../services/documento.service';
 import { Expediente, DocumentoGrupo } from '../models/expediente.model';
@@ -164,7 +165,9 @@ import { UploadDocumentoComponent } from './upload-documento.component';
   `,
 })
 export class ExpedienteShellComponent implements OnInit {
-  private readonly route            = inject(ActivatedRoute);
+	private readonly meta              = inject(Meta);
+	private readonly title             = inject(Title);
+  private readonly route             = inject(ActivatedRoute);
   private readonly expedienteService = inject(ExpedienteService);
   private readonly documentoService  = inject(DocumentoService);
 
@@ -196,10 +199,27 @@ export class ExpedienteShellComponent implements OnInit {
 
     this.expedienteService.findOne(id).subscribe({
       next: (expediente) => {
-        this.expediente.set(expediente);
-        this.grupos.set(expediente.grupos ?? []);
-        this.cargando.set(false);
-      },
+				this.expediente.set(expediente);
+				this.grupos.set(expediente.grupos ?? []);
+				this.cargando.set(false);
+
+				// Meta tags dinámicos
+				this.title.setTitle(
+					`${expediente.numero_expediente} — ${expediente.cliente} | Expediente Jurídico`,
+				);
+				this.meta.updateTag({
+					name: 'description',
+					content: `${expediente.titulo}. Abogado: ${expediente.abogado_responsable}. Estado: ${expediente.estado}.`,
+				});
+				this.meta.updateTag({
+					property: 'og:title',
+					content: `${expediente.numero_expediente} — ${expediente.cliente}`,
+				});
+				this.meta.updateTag({
+					property: 'og:description',
+					content: expediente.descripcion,
+				});
+			},
       error: (err) => {
         this.error.set(err.message || 'Error al cargar el expediente');
         this.cargando.set(false);
