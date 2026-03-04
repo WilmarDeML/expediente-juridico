@@ -5,7 +5,8 @@
   "scripts": {
     "tw:build": "tailwindcss -i ./apps/frontend/src/tailwind.input.css -o ./apps/frontend/src/styles.css",
     "tw:watch": "tailwindcss -i ./apps/frontend/src/tailwind.input.css -o ./apps/frontend/src/styles.css --watch",
-    "seed": "ts-node -P apps/backend/tsconfig.app.json apps/backend/src/common/seed.ts"
+    "seed": "ts-node -P apps/backend/tsconfig.app.json apps/backend/src/common/seed.ts",
+    "seed:prod": "ts-node -P apps/backend/tsconfig.app.json apps/backend/src/common/seed.ts"
   },
   "private": true,
   "devDependencies": {
