@@ -16,6 +16,8 @@ node_modules
 *.launch
 .settings/
 *.sublime-workspace
+*.swp
+*.swo
 
 # IDE - VSCode
 .vscode/*
@@ -52,8 +54,8 @@ vitest.config.*.timestamp*
 .env.local
 
 # Uploads
-apps/backend/uploads/
-
+apps/backend/uploads/*
+!apps/backend/uploads/.gitkeep
 # Nx cache
 .nx/cache
 .nx/workspace-data

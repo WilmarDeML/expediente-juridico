@@ -1,105 +1,143 @@
-# New Nx Repository
+# ⚖️  Expediente Jurídico
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+Sistema de administración de expedientes jurídicos con gestión documental integrada.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+## Stack Tecnológico
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
-## Try the full Nx platform
-🚀 If you haven't connected to Nx Cloud yet, [complete your setup here](https://cloud.nx.app/setup/connect-workspace/guide). Get faster builds with remote caching, distributed task execution, and self-healing CI. [See how your workspace can benefit](#nx-cloud).
-## Generate a library
+| Capa | Tecnología |
+|---|---|
+| Frontend | Angular 19 + SSR |
+| Estilos | TailwindCSS v4 |
+| Backend | NestJS + TypeORM |
+| Base de datos | PostgreSQL |
+| Almacenamiento | Cloudinary |
+| Monorepo | Nx + pnpm |
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+## Funcionalidades
+
+- 📁 Visualización completa del expediente jurídico
+- 📤 Carga múltiple de archivos (PDF, Word, Excel, imágenes)
+- 🗂️ Agrupación de documentos con título y descripción
+- 🗑️ Eliminación de grupos con limpieza automática en Cloudinary
+- 🔄 Actualización reactiva sin recargar la página
+- 🖥️ SSR con TransferState para carga inicial optimizada
+
+## Requisitos
+
+- Node.js v20 o v22 LTS
+- pnpm v9+
+- PostgreSQL 15+
+
+## Instalación
+
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/WilmarDeML/expediente-juridico.git
+cd expediente-juridico
 ```
 
-## Run tasks
+### 2. Instalar dependencias
 
-To build the library use:
-
-```sh
-npx nx build pkg1
+```bash
+pnpm install
+pnpm approve-builds
+pnpm install
 ```
 
-To run any task with Nx use:
+### 3. Configurar variables de entorno
 
-```sh
-npx nx <target> <project-name>
+```bash
+cp .env.example .env
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+Edita el `.env` con tus credenciales:
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```env
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_NAME=expediente_juridico
+DATABASE_USER=expediente_user
+DATABASE_PASSWORD="tu_password"
 
-## Versioning and releasing
+BACKEND_PORT=3000
+NODE_ENV=development
 
-To version and release the library use
+API_URL=http://localhost:3000/api
 
-```
-npx nx release
-```
-
-Pass `--dry-run` to see what would happen without actually releasing the library.
-
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Keep TypeScript project references up to date
-
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
-
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
-npx nx sync
+CLOUDINARY_CLOUD_NAME=tu_cloud_name
+CLOUDINARY_API_KEY=tu_api_key
+CLOUDINARY_API_SECRET=tu_api_secret
 ```
 
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
+### 4. Crear la base de datos
 
-```sh
-npx nx sync:check
+```bash
+psql -U postgres -c "CREATE DATABASE expediente_juridico;"
+psql -U postgres -c "CREATE USER expediente_user WITH ENCRYPTED PASSWORD 'tu_password';"
+psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE expediente_juridico TO expediente_user;"
+psql -U postgres -d expediente_juridico -c "GRANT ALL ON SCHEMA public TO expediente_user;"
 ```
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+### 5. Cargar datos de prueba
 
-## Nx Cloud
-
-Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
-
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Set up CI (non-Github Actions CI)
-
-**Note:** This is only required if your CI provider is not GitHub Actions.
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
+```bash
+pnpm seed
 ```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Desarrollo
 
-## Install Nx Console
+Abre tres terminales:
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+**Terminal 1 — Tailwind CSS watch:**
+```bash
+pnpm tw:watch
+```
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+**Terminal 2 — Backend:**
+```bash
+pnpm nx serve backend
+```
 
-## Useful links
+**Terminal 3 — Frontend:**
+```bash
+pnpm nx serve frontend
+```
 
-Learn more:
+Abre [http://localhost:4200](http://localhost:4200) en el navegador.
 
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Estructura del Proyecto
 
-And join the Nx community:
+```
+expediente-juridico/
+├── apps/
+│   ├── frontend/                  # Angular 19 + SSR
+│   │   └── src/
+│   │       ├── app/
+│   │       │   ├── expediente/    # Componentes del módulo
+│   │       │   ├── models/        # Interfaces TypeScript
+│   │       │   └── services/      # Servicios HTTP
+│   │       └── styles.css         # Generado por Tailwind CLI
+│   └── backend/                   # NestJS
+│       └── src/
+│           ├── common/            # Filtros, interceptores, Cloudinary
+│           ├── documentos/        # Módulo de documentos
+│           └── expedientes/       # Módulo de expedientes
+├── .env.example
+├── render.yaml                    # Configuración de Render
+├── vercel.json                    # Configuración de Vercel
+└── README.md
+```
 
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Despliegue
+
+| Servicio | Plataforma | URL |
+|---|---|---|
+| Frontend | Vercel | pendiente |
+| Backend | Render | pendiente |
+| Base de datos | Render PostgreSQL | pendiente |
+| Archivos | Cloudinary | activo |
+
+## Licencia
+
+MIT
