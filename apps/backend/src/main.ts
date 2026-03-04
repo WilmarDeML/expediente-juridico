@@ -12,7 +12,7 @@ async function bootstrap() {
 
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix, {
-    exclude: ['uploads/(.*)'],
+    exclude: ['uploads/*path'],
   });
 
   // Swagger — debe ir ANTES de los pipes y filtros globales
