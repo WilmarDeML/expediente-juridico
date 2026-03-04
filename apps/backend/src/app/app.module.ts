@@ -16,17 +16,32 @@ import { DocumentosModule } from '../documentos/documentos.module';
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host:     config.get<string>('DATABASE_HOST'),
-        port:     config.get<number>('DATABASE_PORT'),
-        username: config.get<string>('DATABASE_USER'),
-        password: config.get<string>('DATABASE_PASSWORD'),
-        database: config.get<string>('DATABASE_NAME'),
-        entities: [Expediente, DocumentoGrupo, Archivo],
-        synchronize: config.get<string>('NODE_ENV') !== 'production',
-        logging:     config.get<string>('NODE_ENV') === 'development',
-      }),
+      useFactory: (config: ConfigService) => {
+				const databaseUrl = config.get<string>('DATABASE_URL');
+
+				if (databaseUrl) {
+					return {
+						type: 'postgres' as const,
+						url: databaseUrl,
+						entities: [Expediente, DocumentoGrupo, Archivo],
+						synchronize: false,
+						logging: false,
+						ssl: { rejectUnauthorized: false },
+					};
+				}
+
+				return {
+					type: 'postgres' as const,
+					host:     config.get<string>('DATABASE_HOST'),
+					port:     config.get<number>('DATABASE_PORT'),
+					username: config.get<string>('DATABASE_USER'),
+					password: config.get<string>('DATABASE_PASSWORD'),
+					database: config.get<string>('DATABASE_NAME'),
+					entities: [Expediente, DocumentoGrupo, Archivo],
+					synchronize: config.get<string>('NODE_ENV') !== 'production',
+					logging:     config.get<string>('NODE_ENV') === 'development',
+				};
+			},
       inject: [ConfigService],
     }),
     ExpedientesModule,
