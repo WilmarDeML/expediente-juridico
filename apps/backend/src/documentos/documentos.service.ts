@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DocumentoGrupo } from './documento-grupo.entity';
 import { Archivo } from './archivo.entity';
+import { unlink } from 'fs/promises';
+import { join } from 'path';
 
 export interface CrearGrupoDto {
   titulo: string;
@@ -69,12 +71,30 @@ export class DocumentosService {
   }
 
   async eliminarGrupo(id: string): Promise<void> {
-    const grupo = await this.grupoRepository.findOne({ where: { id } });
+		const grupo = await this.grupoRepository.findOne({
+		  where: { id },
+		  relations: { archivos: true },
+		});
 
-    if (!grupo) {
-      throw new NotFoundException(`Grupo con id ${id} no encontrado`);
-    }
+		if (!grupo) {
+		  throw new NotFoundException(`Grupo con id ${id} no encontrado`);
+		}
 
-    await this.grupoRepository.remove(grupo);
-  }
+		// Eliminar archivos físicos del disco
+		for (const archivo of grupo.archivos) {
+		  const rutaArchivo = join(
+		    process.cwd(),
+		    'apps/backend/uploads',
+		    archivo.nombre_almacenado,
+		  );
+		  try {
+		    await unlink(rutaArchivo);
+		  } catch {
+		    // Si el archivo no existe en disco, continuamos sin lanzar error
+		    console.warn(`Archivo no encontrado en disco: ${archivo.nombre_almacenado}`);
+		  }
+		}
+
+		await this.grupoRepository.remove(grupo);
+	}
 }
