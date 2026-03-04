@@ -51,7 +51,10 @@ async function bootstrap() {
 
   // CORS
   app.enableCors({
-    origin: ['http://localhost:4200'],
+    origin: [
+    	'http://localhost:4200',
+    	'https://expediente-juridico-frontend.onrender.com'
+    ],
     methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
