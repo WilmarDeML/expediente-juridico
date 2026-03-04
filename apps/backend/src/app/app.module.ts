@@ -3,12 +3,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { Expediente } from '../expedientes/expediente.entity';
+import { DocumentoGrupo } from '../documentos/documento-grupo.entity';
+import { Archivo } from '../documentos/archivo.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: require('path').resolve(__dirname, '../../../../.env'),
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -19,7 +21,7 @@ import { AppService } from './app.service';
         username: config.get<string>('DATABASE_USER'),
         password: config.get<string>('DATABASE_PASSWORD'),
         database: config.get<string>('DATABASE_NAME'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        entities: [Expediente, DocumentoGrupo, Archivo],
         synchronize: config.get<string>('NODE_ENV') !== 'production',
         logging:     config.get<string>('NODE_ENV') === 'development',
       }),
