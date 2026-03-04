@@ -3,8 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DocumentoGrupo } from './documento-grupo.entity';
 import { Archivo } from './archivo.entity';
-import { unlink } from 'fs/promises';
-import { join } from 'path';
+import { CloudinaryService } from '../common/cloudinary.service';
 
 export interface CrearGrupoDto {
   titulo: string;
@@ -18,7 +17,6 @@ export interface CrearArchivoDto {
   mime_type: string;
   tamanio: number;
   url: string;
-  grupo_id: string;
 }
 
 @Injectable()
@@ -40,25 +38,24 @@ export class DocumentosService {
 
   async crearGrupoConArchivos(
     dto: CrearGrupoDto,
-    archivos: Express.Multer.File[],
-    baseUrl: string,
+    archivos: CrearArchivoDto[],
   ): Promise<DocumentoGrupo> {
     const grupo = this.grupoRepository.create({
-      titulo: dto.titulo,
-      descripcion: dto.descripcion,
+      titulo:        dto.titulo,
+      descripcion:   dto.descripcion,
       expediente_id: dto.expediente_id,
     });
 
     const grupoGuardado = await this.grupoRepository.save(grupo);
 
-    const archivosEntidades = archivos.map((file) =>
+    const archivosEntidades = archivos.map((archivo) =>
       this.archivoRepository.create({
-        nombre_original: file.originalname,
-        nombre_almacenado: file.filename,
-        mime_type: file.mimetype,
-        tamanio: file.size,
-        url: `${baseUrl}/uploads/${file.filename}`,
-        grupo_id: grupoGuardado.id,
+        nombre_original:   archivo.nombre_original,
+        nombre_almacenado: archivo.nombre_almacenado,
+        mime_type:         archivo.mime_type,
+        tamanio:           archivo.tamanio,
+        url:               archivo.url,
+        grupo_id:          grupoGuardado.id,
       }),
     );
 
@@ -70,31 +67,24 @@ export class DocumentosService {
     }) as Promise<DocumentoGrupo>;
   }
 
-  async eliminarGrupo(id: string): Promise<void> {
-		const grupo = await this.grupoRepository.findOne({
-		  where: { id },
-		  relations: { archivos: true },
-		});
+  async eliminarGrupo(
+    id: string,
+    cloudinaryService: CloudinaryService,
+  ): Promise<void> {
+    const grupo = await this.grupoRepository.findOne({
+      where: { id },
+      relations: { archivos: true },
+    });
 
-		if (!grupo) {
-		  throw new NotFoundException(`Grupo con id ${id} no encontrado`);
-		}
+    if (!grupo) {
+      throw new NotFoundException(`Grupo con id ${id} no encontrado`);
+    }
 
-		// Eliminar archivos físicos del disco
-		for (const archivo of grupo.archivos) {
-		  const rutaArchivo = join(
-		    process.cwd(),
-		    'apps/backend/uploads',
-		    archivo.nombre_almacenado,
-		  );
-		  try {
-		    await unlink(rutaArchivo);
-		  } catch {
-		    // Si el archivo no existe en disco, continuamos sin lanzar error
-		    console.warn(`Archivo no encontrado en disco: ${archivo.nombre_almacenado}`);
-		  }
-		}
+    // Eliminar archivos de Cloudinary
+    for (const archivo of grupo.archivos) {
+      await cloudinaryService.eliminarArchivo(archivo.nombre_almacenado);
+    }
 
-		await this.grupoRepository.remove(grupo);
-	}
+    await this.grupoRepository.remove(grupo);
+  }
 }

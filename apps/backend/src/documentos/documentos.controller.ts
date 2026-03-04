@@ -12,16 +12,18 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname, join } from 'path';
-import { v4 as uuidv4 } from 'uuid';
+import { memoryStorage } from 'multer';
 import { Request } from 'express';
 import { DocumentosService } from './documentos.service';
+import { CloudinaryService } from '../common/cloudinary.service';
 import { DocumentoGrupo } from './documento-grupo.entity';
 
 @Controller('expedientes/:expedienteId/documentos')
 export class DocumentosController {
-  constructor(private readonly documentosService: DocumentosService) {}
+  constructor(
+    private readonly documentosService: DocumentosService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   @Get()
   findByExpediente(
@@ -33,13 +35,7 @@ export class DocumentosController {
   @Post()
   @UseInterceptors(
     FilesInterceptor('archivos', 10, {
-      storage: diskStorage({
-        destination: join(process.cwd(), 'apps/backend/uploads'),
-        filename: (_req, file, cb) => {
-          const uniqueName = `${uuidv4()}${extname(file.originalname)}`;
-          cb(null, uniqueName);
-        },
-      }),
+      storage: memoryStorage(),
       fileFilter: (_req, file, cb) => {
         const allowedMimes = [
           'application/pdf',
@@ -53,7 +49,12 @@ export class DocumentosController {
         if (allowedMimes.includes(file.mimetype)) {
           cb(null, true);
         } else {
-          cb(new BadRequestException(`Tipo de archivo no permitido: ${file.mimetype}`), false);
+          cb(
+            new BadRequestException(
+              `Tipo de archivo no permitido: ${file.mimetype}`,
+            ),
+            false,
+          );
         }
       },
       limits: { fileSize: 10 * 1024 * 1024 },
@@ -64,7 +65,7 @@ export class DocumentosController {
     @Body('titulo') titulo: string,
     @Body('descripcion') descripcion: string,
     @UploadedFiles() archivos: Express.Multer.File[],
-    @Req() req: Request,
+    @Req() _req: Request,
   ): Promise<DocumentoGrupo> {
     if (!archivos || archivos.length === 0) {
       throw new BadRequestException('Debe adjuntar al menos un archivo');
@@ -74,12 +75,41 @@ export class DocumentosController {
       throw new BadRequestException('El título es requerido');
     }
 
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    // Subir archivos a Cloudinary
+    const cloudinary = this.cloudinaryService.getCloudinary();
+    const archivosSubidos = await Promise.all(
+      archivos.map(async (file) => {
+        const result = await new Promise<{
+          public_id: string;
+          secure_url: string;
+        }>((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            {
+              folder: 'expedientes',
+              resource_type: 'raw',
+              public_id: `${Date.now()}_${file.originalname}`,
+            },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result as { public_id: string; secure_url: string });
+            },
+          );
+          uploadStream.end(file.buffer);
+        });
+
+        return {
+          nombre_original:    file.originalname,
+          nombre_almacenado:  result.public_id,
+          mime_type:          file.mimetype,
+          tamanio:            file.size,
+          url:                result.secure_url,
+        };
+      }),
+    );
 
     return this.documentosService.crearGrupoConArchivos(
       { titulo, descripcion, expediente_id: expedienteId },
-      archivos,
-      baseUrl,
+      archivosSubidos,
     );
   }
 
@@ -87,6 +117,9 @@ export class DocumentosController {
   eliminarGrupo(
     @Param('grupoId', ParseUUIDPipe) grupoId: string,
   ): Promise<void> {
-    return this.documentosService.eliminarGrupo(grupoId);
+    return this.documentosService.eliminarGrupo(
+      grupoId,
+      this.cloudinaryService,
+    );
   }
 }
