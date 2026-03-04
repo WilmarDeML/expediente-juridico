@@ -1,0 +1,29 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono&display=swap');
+
+@theme {
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "IBM Plex Sans", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+
+  --color-juridico-50:  #f0f4f8;
+  --color-juridico-100: #d9e2ec;
+  --color-juridico-200: #bcccdc;
+  --color-juridico-300: #9fb3c8;
+  --color-juridico-400: #829ab1;
+  --color-juridico-500: #627d98;
+  --color-juridico-600: #486581;
+  --color-juridico-700: #334e68;
+  --color-juridico-800: #243b53;
+  --color-juridico-900: #102a43;
+
+  --color-estado-activo:    #16a34a;
+  --color-estado-espera:    #d97706;
+  --color-estado-cerrado:   #dc2626;
+  --color-estado-archivado: #6b7280;
+}
+
+@layer base {
+  html { font-family: var(--font-body); }
+  h1, h2, h3 { font-family: var(--font-display); }
+}
