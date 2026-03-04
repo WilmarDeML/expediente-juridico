@@ -37,6 +37,21 @@ services:
         sync: false
       - key: CLOUDINARY_API_SECRET
         sync: false
+        
+	- type: web
+    name: expediente-juridico-frontend
+    runtime: node
+    rootDir: .
+    buildCommand: pnpm install && pnpm tw:build && pnpm nx build frontend --configuration=production
+    startCommand: node dist/apps/frontend/server/server.mjs
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: API_URL
+        value: https://expediente-juridico-backend.onrender.com/api
 
 databases:
   - name: expediente-juridico-db
