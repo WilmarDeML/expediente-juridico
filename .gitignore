@@ -46,3 +46,18 @@ Thumbs.db
 .angular
 
 vitest.config.*.timestamp*
+
+# Env
+.env
+.env.local
+
+# Uploads
+apps/backend/uploads/
+
+# Nx cache
+.nx/cache
+.nx/workspace-data
+
+# Logs
+*.log
+npm-debug.log*
