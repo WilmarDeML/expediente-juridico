@@ -8,6 +8,7 @@ import {
   StateKey,
 } from '@angular/core';
 import { Expediente, ApiResponse } from '../models/expediente.model';
+import { environment } from '../../environments/environment';
 
 const EXPEDIENTE_KEY = (id: string): StateKey<Expediente> =>
   makeStateKey<Expediente>(`expediente_${id}`);
@@ -21,7 +22,7 @@ export class ExpedienteService {
   private readonly http       = inject(HttpClient);
   private readonly transferState = inject(TransferState);
   private readonly platformId    = inject(PLATFORM_ID);
-  private readonly apiUrl        = 'https://expediente-juridico-backend.onrender.com/api';
+	private readonly apiUrl = environment.apiUrl;
 
   findAll(): Observable<Expediente[]> {
     const cached = this.transferState.get(EXPEDIENTES_KEY, null);

@@ -4,6 +4,7 @@ import { Observable, map, of, EMPTY } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { TransferState, makeStateKey } from '@angular/core';
 import { DocumentoGrupo, ApiResponse } from '../models/expediente.model';
+import { environment } from '../../environments/environment';
 
 const GRUPOS_KEY = (expedienteId: string) =>
   makeStateKey<DocumentoGrupo[]>(`grupos_${expedienteId}`);
@@ -15,7 +16,7 @@ export class DocumentoService {
   private readonly http          = inject(HttpClient);
   private readonly transferState = inject(TransferState);
   private readonly platformId    = inject(PLATFORM_ID);
-  private readonly apiUrl        = 'https://expediente-juridico-backend.onrender.com/api';
+	private readonly apiUrl = environment.apiUrl;
 
   findByExpediente(expedienteId: string): Observable<DocumentoGrupo[]> {
     const key    = GRUPOS_KEY(expedienteId);
