@@ -14,6 +14,13 @@ export const appRoutes: Routes = [
       ),
   },
   {
+    path: 'health',
+    loadComponent: () =>
+      import('./health/health.component').then(
+        (m) => m.HealthComponent,
+      ),
+  },
+  {
     path: '**',
     redirectTo: 'expedientes/d06b0ba2-5c70-49ba-a642-ba48258df3c3',
   },
