@@ -221,7 +221,7 @@ export class ExpedienteShellComponent implements OnInit {
 				});
 			},
       error: (err) => {
-        this.error.set(err.message || 'Error al cargar el expediente');
+        this.error.set(err.error.message || 'Error al cargar el expediente');
         this.cargando.set(false);
       },
     });
